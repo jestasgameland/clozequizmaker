@@ -1,0 +1,42 @@
+h1 {
+	font-size: 36px;
+	font-family: Helvetica;
+	font-weight: bold;
+	color: #5074aa;
+}
+
+h2 {
+	font-size: 24px;
+	font-family: Helvetica;
+	font-weight: bold;
+	color: #5074aa;
+}
+
+.small-text {
+	font-size: 12px;
+	font-family: Helvetica;	
+	margin: 3px;
+	line-height: 25%;
+}
+
+.med-text {
+	font-size: 14px;
+	font-family: Helvetica;	
+	margin: 3px;
+}
+
+.big-text {
+	font-size: 24px;
+	font-family: Helvetica;
+}
+
+#wordbank {
+	padding: 5px;
+	display: inline-block;
+}
+
+#message {
+	font-size: 14px;
+	font-family: Helvetica;	
+	color: orange;
+}
