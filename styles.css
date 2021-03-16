@@ -20,7 +20,7 @@ h2 {
 }
 
 .med-text {
-	font-size: 14px;
+	font-size: 16px;
 	font-family: Helvetica;	
 	margin: 3px;
 }
@@ -30,13 +30,36 @@ h2 {
 	font-family: Helvetica;
 }
 
-#wordbank {
+.row {
 	padding: 5px;
+	border: solid lightblue 3px;
+	width: 80vw;
+}
+
+.sentence {
+	border: none;
+}
+
+.word-div {
+	min-width: 50px;
+	padding: 0 15px;
+	text-align: center;
 	display: inline-block;
+	border-radius: 10px;
+}
+
+.word-div:hover, .sentence:hover {
+	background-color: lightblue;
+	font-weight: bold;
+	cursor: pointer;
 }
 
 #message {
 	font-size: 14px;
 	font-family: Helvetica;	
 	color: orange;
+}
+
+#wordbank {
+	visibility: hidden;
 }

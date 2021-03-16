@@ -1,125 +1,57 @@
-<!--	Cloze Quiz Generator v1.0
-		Created by Brendon Albertson   Feb, 2017
+<!--	
+		Created by Brendon Albertson
+		albertsonbrendon@gmail.com
 -->
 
 <!DOCTYPE html>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<html lang="en">
 
 <head>
+	<meta charset="utf-8">
+
+	<title>Cloze Quiz Generator</title>
+	<meta name="description" content="An app to automate the creation of cloze vocabulary activities.">
+	<meta name="author" content="Brendon Albertson">
+
 	<link rel="stylesheet" type="text/css" href="styles.css">
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
 </head>
 	
 <body>
 
 	<h1 id='title'>Cloze Quiz Generator</h1>
-	<p class='small-text'>Created by Brendon Albertson, to automate the creation of cloze (fill-in-the-blank) style vocabulary quizzes.  Powered by the <a href='http://www.twinword.com'>Twinword</a> API.</p>
+	<p class='small-text'>Created by Brendon Albertson, to automate the creation of cloze (fill-in-the-blank) style vocabulary quizzes.  Powered by the <a href='http://www.tatoeba.org'>Tatoeba Corpus</a></p>
+
+<!--
+	<p style="color: green"class='big-text'>***Note: If this is your first time running this app, please wait up to 30 seconds to generate the quiz!  After the first time, it will be smoother.</p>
+-->
 
 	<p class='big-text'>Enter words, separated by commas:</p>
 
-	<input type='text' id='search' size=100/>
+	<input type='text' placeholder = '(Example: adverse, exemplify, substantial)' id='search' size=100/>
 
-	<button onclick="getData()">Make Quiz</button>
+	<p>Sentences per word:</p>
 
-	<p id='examples'><span class='small-text'>(Example: <i>adverse, exemplify, substantial</i>)</span></p>
+	<input type='text' id='sentences-per-word' size=1/>
+
+	<br><br>
+
+	<button onclick="main()">Make Quiz</button>
+
+	<p id='examples'><span class='small-text'></span></p>
 
 	<p id='header' class='med-text'></p>
-	<div id='wordbank' class='med-text'></div>
+	<div id='wordbank' class='row med-text'></div>
 	<br><br>
-	<p id='sentences' class='med-text'></p>
+	<div id='sentences' class='med-text'></div>
 	<div id='message'></div>
 
 
-	<!--Initialize global variables-->
-	<script>
-	var word = '';
-	var sentenceNumber = 1;
-	var sentence = '';
-	var wb = document.getElementById('wordbank');
-	</script>
-
-
-	<script>  
-
-		//add sentences from the data to the sentences DIV
-		function makeCloze(data) {
-
-			word = data.entry;
-
-			var x = Math.floor(Math.random() * data.example.length-1);
-
-			try {
-
-				sentence = data.example[x].replace(word, "_______");
-					
-				document.getElementById('sentences').innerHTML += sentenceNumber + '.' + "&nbsp&nbsp&nbsp" + sentence + '<br><br>';
-
-				sentenceNumber ++;
-			}
-			catch(err) {
-				document.getElementById('message').innerHTML = "Note: One or more sentences could not be generated. Sorry about that. I'm working on it! Please try again."
-			}			
-
-		};
-
-		function getData() {
-
-			//clear everything from the previous search first:
-
-			document.getElementById('sentences').innerHTML = '';
-			document.getElementById('examples').innerHTML = '';
-			document.getElementById('wordbank').innerHTML = '';
-			document.getElementById('message').innerHTML = '';
-			sentenceNumber = 1;
-
-			var searchTerms = $('#search').val().replace(/,\s+/g,",").split(",");
-
-			//get JSON data from API:
-
-			for (i=0; i<searchTerms.length; i++) {
-
-				word = searchTerms[i];
-
-				$.ajax({
-				    url: 'https://twinword-word-graph-dictionary.p.mashape.com/example/', 
-				    type: 'GET', 
-				    data: {entry: word}, 
-				    dataType: 'json',
-				    success: function(json) { makeCloze(json); },
-				    error: function(err) { alert(err); },
-				    beforeSend: function(xhr) {
-				    xhr.setRequestHeader("X-Mashape-Authorization", "Q5vh0rROYlmshbImqcocJUHxt5EMp1ZXnqqjsnvSeJyzMTUZ8x"); 
-				    }
-				});
-
-				//add word to wordbank
-				wb.innerHTML += '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' + word;
-			};
-
-			//add one more space at end of wordbank, and border
-			wb.innerHTML += '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';
-			wb.setAttribute('style', 'border: solid black 3px');
-
-			//add the name line and directions
-			document.getElementById('header').innerHTML = '<p>Name: ________________________________________</p><p><strong>Directions: Write the correct word in each blank.  Use words from the box.</strong></p>';
-
-
-		};
-
-
-
-		//run the search when user presses Enter
-		addEventListener('keydown', function(event) {
-
-			if (event.keyCode == 13) {
-
-				getData();
-			};
-		});
-
-
-
-	</script>
+	<script src="sentences_fetcher.js"></script>
+	
+	<script src="shuffle.js"></script>
 
 </body>
