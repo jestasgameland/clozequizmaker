@@ -23,23 +23,29 @@
 <body>
 
 	<h1 id='title'>Cloze Quiz Generator</h1>
-	<p class='small-text'>Created by Brendon Albertson, to automate the creation of cloze (fill-in-the-blank) style vocabulary quizzes.  Powered by the <a href='http://www.tatoeba.org'>Tatoeba Corpus</a></p>
+	<p class='small-text'>Created by <a href="https://www.brendonalbertson.com">Brendon Albertson</a>, to automate the creation of cloze (fill-in-the-blank) style vocabulary quizzes.  Powered by the <a href='http://www.tatoeba.org'>Tatoeba Corpus</a></p>
 
 <!--
 	<p style="color: green"class='big-text'>***Note: If this is your first time running this app, please wait up to 30 seconds to generate the quiz!  After the first time, it will be smoother.</p>
 -->
 
-	<p class='big-text'>Enter words, separated by commas:</p>
+	<p class='big-text'>Enter words <strong>(or phrases!)</strong>, separated by commas:</p>
 
-	<input type='text' placeholder = '(Example: adverse, exemplify, substantial)' id='search' size=100/>
+	<input type='text' placeholder = '(Examples: explore, creative, out of control, a little, the largest)' id='search' size=100/>
 
-	<p>Sentences per word:</p>
+	<br>
+	<br>
+	<div>
+		<div id = 'alert'>Sentences per word/phrase:</div>
 
-	<input type='text' id='sentences-per-word' size=1/>
+		<div id = "number-box-div">
+		<input type='text' id='sentences-per-word' placeholder='#' size=1/>
+		</div>
+	</div>
 
 	<br><br>
 
-	<button onclick="main()">Make Quiz</button>
+	<button id='start-button' onclick="main()">Make Quiz</button>
 
 	<p id='examples'><span class='small-text'></span></p>
 
