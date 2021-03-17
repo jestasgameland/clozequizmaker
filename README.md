@@ -7,6 +7,8 @@ DIRECTIONS:
 - First unzip the sentences file.  This is the Tatoeba corpus.  Then the app can be run as normal.
 
 TO DO:
-- make printable worksheet option
-- increase loading speed of the Tatoeba corpus (an array of over 1,000,000 sentences)
+- option to create printable worksheet
+- mobile support
+- other languages support (Tatoeba corpus has multiple languages)
+- increase loading speed of Tatoeba corpus (large JSON file of over 1,000,000 sentences currently takes up to 30s)
 - Explore ways to fetch sentences as needed from an API, rather than iterate through a huge list to find a sentence with each target word
