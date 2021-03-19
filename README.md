@@ -1,4 +1,4 @@
-Cloze Quiz Generator v1.1
+Cloze Quiz Generator v1.2
 
 An app for automating the creation of cloze (fill-in-the-blank) vocabulary activities.
 Powered by the Tatoeba corpus.
