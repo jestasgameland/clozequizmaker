@@ -5,6 +5,7 @@ var searchTerms;
 var selectedSenElement;
 var selectedSenName;
 var selectedWord;
+var sentencesPerWord;
 
 var clickedSentence = false;
 var clickedWord = false;
@@ -18,6 +19,15 @@ var clozeSentences = [];
 var score = 0;
 
 var count;
+var alreadyMadeWordDiv = false;
+var foundWord = false;
+
+var fileNo = 0;
+var fileName = 'data/sentences' + fileNo + '.json' ;
+
+var queryCount = 0;
+
+
 
 
 
@@ -46,6 +56,9 @@ function main() {
 	clickedWord = false;
 	clickedSentence = false;
 	clozeSentences = [];
+	queryCount = 0;
+	fileNo = 0;
+	fileName = 'data/sentences0.json';
 
 	wb.style.visibility = 'visible';
 
@@ -61,12 +74,12 @@ function main() {
 };
 
 
-function makeClozeSentence(sen, correctWord, id) {
+function makeClozeSentence(sen, correctWord, name) {
 
 	var sentenceDiv = document.createElement('div');
 	sentenceDiv.innerHTML = sen + '<br><br>';
 	sentenceDiv.className = 'row sentence';
-	sentenceDiv.setAttribute('name', correctWord + "-" + id);
+	sentenceDiv.setAttribute('name', correctWord + "-" + name);
 
 	sentenceDiv.addEventListener("click", function() {
 
@@ -111,12 +124,16 @@ function makeClozeSentence(sen, correctWord, id) {
 	clozeSentences.push(sentenceDiv);
 
 	count ++;  
+
+	//reset filename back to first 100,000 sentences:
+	fileNo = 0;
+	fileName = 'data/sentences' + fileNo + '.json' ;
 }
 
 
 
 function win() {
-	alert("You win!");
+	alert("You win!  You can make another quiz by entering new settings.");
 	resetSelected();
 }
 
@@ -128,7 +145,7 @@ function correctAnswer() {
 	selectedSenElement.style.pointerEvents = 'none';
 	wb.style.backgroundColor = 'lightgreen';
 	score ++;
-	if (score == noOfSentences) { 
+	if (score == clozeSentences.length) { 
 		win();
 		return;
 	}
@@ -154,88 +171,109 @@ function resetSelected() {
 }
 
 
-
-function getSentences(wordsArray) {  //gets sentences with the target words from Tatoeba corpus JSON file
-
-
-	document.getElementById('sentences').innerHTML = "<h2>Loading...Please wait up to 30 seconds...</h2><br><br>";
-
+function loadCorpus(query, fileId, doThisNext) {
 
 	$.ajax({
 	    type : "GET",
-	    url : "sentences.json",
+	    url : fileId,
 	    async : true,  
 	    dataType : 'json',
 	    success : function(response) {
-
-	    	document.getElementById('sentences').innerHTML = "";
-
-	    	var sentencesPerWord = document.getElementById('sentences-per-word').value;
-	    	
-	    	var endWord;
-	    	var word;
-
-	    	//for every word entered...
-	    	for (i=0; i<wordsArray.length; i++) {
-
-	    		counterForIds ++;
-
-	 	   		word = ' ' + wordsArray[i] + ' ';
-	    		endWord = ' ' + wordsArray[i] + '.';
-
-	    		//First, check that the word actually exists in the corpus of sentences:
-	    		count = -1;
-
-	    		//search through the Tatoeba list of over 1,000,000 sentences:
-		    	for (j=0; j<response.sentences.length; j++) {
-
-					//if word is found in a sentence:
-		    		if (response.sentences[j].includes(word)) {
-
-		    			//add the word to wordbank:
-		    			makeWordDiv(wordsArray[i]);
-
-		    			var sentence = response.sentences[j].replace(word, " _______ ");
-
-		    			counterForNames++;
-		    			//make a cloze sentence and add it to the clozeSentences array:
-						makeClozeSentence(sentence, wordsArray[i], counterForNames);
-						
-		    		}
-
-		    		//if word found at END of sentence:
-		    		else if (response.sentences[j].includes(endWord)) {
-
-		    			//add the word to wordbank:
-		    			makeWordDiv(wordsArray[i]);
-
-		    			var sentence = response.sentences[j].replace(endWord, " _______.");
-
-		    			counterForNames++;
-		    			//make a cloze sentence and add it to the clozeSentences array:
-		    			makeClozeSentence(sentence, wordsArray[i], counterForNames);
-		    		}
-
-		    		//stop getting sentences after you've found enough:
-		    		if (count == sentencesPerWord) { break };
-		    	};	
-
-
-
-
-
-	   
-
-
-
-
-		    	noOfSentences = clozeSentences.length / 2;
-
-			}
-
-			addClozeDivs();
-		}
+	    	doThisNext(query, response);
+	    }
 	});
+}
+
+
+function getSentences(wordsArray) {  //gets sentences with the target words from Tatoeba corpus JSON file
+	
+	document.getElementById('loading').innerHTML = "<h2>Loading...Please wait...</h2><br><br>";
+
+	sentencesPerWord = document.getElementById('sentences-per-word').value;	
+	var query;
+
+	counterForIds ++;
+	count = 0;
+	foundWord = false;
+	alreadyMadeWordDiv = false;
+
+	loadCorpus(wordsArray[queryCount], fileName, searchCorpus);  //loads, then searches, the chunk of the corpus	
+}
+
+
+
+function searchCorpus(query, dataToSearch) {  //dataToSearch is the response from ajax (json object)
+	var	word    = ' ' + query + ' ';
+	var endWord = ' ' + query + '.';
+	count = 0;
+	alreadyMadeWordDiv = false;
+	//	var wordWithComma = ' ' + wordsArray[i] + ',';
+	//	var wordWithColon = ' ' + wordsArray[i] + ':';
+
+	//search through 100,000 sentences of the Tatoeba corpus:
+	for (j=0; j<dataToSearch.sentences.length; j++) {
+
+		//if word is found in a sentence:
+		if (dataToSearch.sentences[j].includes(word)) {
+
+			if (!foundWord) {queryCount ++};  //only increase queryCount by 1 per word, not per sentence (sometimes multiple sentences per word)
+
+			foundWord = true;
+			
+			//add the word to wordbank:
+			if (!alreadyMadeWordDiv) { makeWordDiv(query) };  //prevents adding the words multiple times (if noOfSentences to get is > 1 )
+			
+			var sentence = dataToSearch.sentences[j].replace(word, " _______ ");
+
+			counterForNames++;
+			//make a cloze sentence and add it to the clozeSentences array:
+			makeClozeSentence(sentence, query, counterForNames);
+
+			
+		}
+
+		//if word found at END of sentence:
+		else if (dataToSearch.sentences[j].includes(endWord)) {
+
+			if (!foundWord) {queryCount ++};
+			foundWord = true;
+
+			//add the word to wordbank:
+			if (!alreadyMadeWordDiv) { makeWordDiv(query) };
+
+			var sentence = dataToSearch.sentences[j].replace(endWord, " _______.");
+
+			counterForNames++;
+			//make a cloze sentence and add it to the clozeSentences array:
+			makeClozeSentence(sentence, query, counterForNames);
+		}
+
+		//stop getting sentences after you've found enough:
+		if (count == sentencesPerWord) { break };  // (count is set by makeClozeSentence)
+	}
+
+	// if nothing found in these 100,000 sentences, so move to the next 100,000:
+	if (!foundWord) {
+		console.log("nothing found in first file, on to the next...");
+		fileNo ++;
+		fileName = 'data/sentences' + fileNo + '.json' ;
+		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
+	}
+
+	//if more words still remain, go on to search for the next word (this, rather than a for loop, is needed for async ajax)
+	else if (queryCount < searchTerms.length) {
+		console.log("on to the next word...");
+		foundWord = false;
+		fileNo = 0;
+		fileName = 'data/sentences0.json' ;  //reset to first file
+		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
+	}
+
+	else{
+		//done
+		addClozeDivs();
+		document.getElementById('loading').innerHTML = '';
+	};
 }
 
 
@@ -247,6 +285,8 @@ function makeWordDiv(wordToUse) {
 	wordDiv.className = 'word-div';
 	wordDiv.id = wordToUse + "-" + counterForIds;
 	wb.appendChild(wordDiv);
+
+	alreadyMadeWordDiv = true;
 
 	wordDiv.addEventListener("click", function() {
 
@@ -292,12 +332,10 @@ function addClozeDivs() {
 	 // loop over clozeSentences to add the divs!
 	shuffle(clozeSentences);
 	
-	var n = 1;
-	for (i<0; i<clozeSentences.length; i++) {
+	for (i=0; i<clozeSentences.length; i++) {
 		//add the numbers:
-		clozeSentences[i].innerHTML = n + '.' + "&nbsp&nbsp&nbsp" + clozeSentences[i].innerHTML;
+		clozeSentences[i].innerHTML = (i+1) + '.' + "&nbsp&nbsp&nbsp" + clozeSentences[i].innerHTML;
 		document.getElementById('sentences').appendChild(clozeSentences[i]);
-		n++;
     };
 }
 
