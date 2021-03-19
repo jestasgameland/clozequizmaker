@@ -4,7 +4,8 @@ An app for automating the creation of cloze (fill-in-the-blank) vocabulary activ
 Powered by the Tatoeba corpus.
 
 DIRECTIONS:
-- First unzip the sentences file.  This is the Tatoeba corpus.  Then the app can be run as normal.
+- First unzip the "data.zip" file.  This is a set of JSON files each containing a chunk of the Tatoeba corpus.  Then the app can be run as normal.
+- To make the loading even faster, "split_json.py" can be run on the entire list of sentences in the Tatoeba corpus (tatoeba.zip), specifying a number for "sentencesPerFile"
 
 TO DO:
 - option to create printable worksheet
