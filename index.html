@@ -9,6 +9,7 @@
 
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
 
 	<title>Cloze Quiz Generator</title>
 	<meta name="description" content="An app to automate the creation of cloze vocabulary activities.">
@@ -23,38 +24,43 @@
 <body>
 
 	<h1 id='title'>Cloze Quiz Generator</h1>
-	<p class='small-text'>Created by <a href="https://www.brendonalbertson.com">Brendon Albertson</a>, to automate the creation of cloze (fill-in-the-blank) style vocabulary quizzes.  Powered by the <a href='http://www.tatoeba.org'>Tatoeba Corpus</a></p>
-
-<!--
-	<p style="color: green"class='big-text'>***Note: If this is your first time running this app, please wait up to 30 seconds to generate the quiz!  After the first time, it will be smoother.</p>
--->
 
 	<p class='big-text'>Enter words <strong>(or phrases!)</strong>, separated by commas:</p>
+	<br>
 
-	<input type='text' placeholder = '(Examples: explore, creative, out of control, a little, the largest)' id='search' size=100/>
+	<input type='text' placeholder = '(Examples: explore, creative, out of control, a little)' id='search'/>
 
 	<br>
 	<br>
 	<div>
-		<div id = 'alert'>Sentences per word/phrase:</div>
-
 		<div id = "number-box-div">
-		<input type='text' id='sentences-per-word' placeholder='#' size=1/>
+			<label id = 'alert' class='small-text' for='number-box'>Sentences per word/phrase:</label>
+			<input inputmode="numeric" pattern="[0-9]*" type='number' name='number-box' id='sentences-per-word' placeholder='#' size=1/>
 		</div>
 	</div>
 	<br>
-	<div id = 'loading'></div>
-	<br><br>
 
 	<button id='start-button' onclick="main()">Make Quiz</button>
-
-	<p id='examples'><span class='small-text'></span></p>
+	<div id='message'></div>
 
 	<p id='header' class='med-text'></p>
+
 	<div id='wordbank' class='row med-text'></div>
-	<br><br>
+
 	<div id='sentences' class='med-text'></div>
-	<div id='message'></div>
+
+	<div id='tips'>
+		<h3>Tips:</h3>
+		<ul>
+			<li>To practice vocabulary, enter any number of words. To practice collocations, enter phrases.</li>
+			<li>To practice articles, enter "a, an, the" and 5-10 for # of sentences.</li>
+			<li>To practice <i>have</i> vs. <i>has</i>, enter "have, has" and 5-10 for # of sentences.</li>
+			<li>To practice participial adjectives, enter pairs like "bored, boring, exited, exciting, amazed, amazing".</li>
+			<li>To practice conjugation of the verb "be", enter "is, am, are, was, were".</li>
+		</ul>
+	</div>
+
+	<footer>Created by <a href="https://www.brendonalbertson.com">Brendon Albertson</a>.  Powered by the <a href='http://www.tatoeba.org'>Tatoeba Corpus</a></footer>
 
 
 	<script src="sentences_fetcher.js"></script>

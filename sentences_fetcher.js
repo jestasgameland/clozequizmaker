@@ -22,8 +22,9 @@ var count;
 var alreadyMadeWordDiv = false;
 var foundWord = false;
 
-var fileNo = 0;
-var fileName = 'data/sentences' + fileNo + '.json' ;
+var initialFileNo;
+var fileNo;
+var fileName;
 
 var queryCount = 0;
 
@@ -45,9 +46,10 @@ function main() {
 
 	//clear everything from the previous search first:
 	document.getElementById('sentences').innerHTML = '';
-	document.getElementById('examples').innerHTML = '';
+	document.getElementById('tips').innerHTML = '';
 	document.getElementById('wordbank').innerHTML = '';
 	document.getElementById('message').innerHTML = '';
+	document.getElementById('message').style.display = 'none';
 	document.getElementById('start-button').innerHTML = 'Make Quiz';
 
 	counterForNames = 0;
@@ -57,15 +59,17 @@ function main() {
 	clickedSentence = false;
 	clozeSentences = [];
 	queryCount = 0;
-	fileNo = 0;
-	fileName = 'data/sentences0.json';
+	initialFileNo = Math.floor(Math.random() * 31);
+	fileNo = initialFileNo; // fileNo will be changed, but initialFileNo won't
+	fileName = 'data/sentences' + initialFileNo + '.json';
+
 
 	wb.style.visibility = 'visible';
 
 	//add the name line and directions
-	document.getElementById('header').innerHTML = '<br><br><p><strong>Directions: Click a word and a sentence to make a match.</strong></p>';
+	document.getElementById('header').innerHTML = '<strong>Directions: Click a word and a sentence to make a match.</strong>';
 
-	searchTerms = $('#search').val().replace(/,\s+/g,",").split(",");
+	searchTerms = $('#search').val().toLowerCase().replace(/,\s+/g,",").split(",");
 
 	searchTerms = shuffle(searchTerms);
 				
@@ -126,8 +130,9 @@ function makeClozeSentence(sen, correctWord, name) {
 	count ++;  
 
 	//reset filename back to first 100,000 sentences:
-	fileNo = 0;
-	fileName = 'data/sentences' + fileNo + '.json' ;
+//	fileNo = 0;
+//	fileName = 'data/sentences' + fileNo + '.json' ;
+//	fileName = 'data/sentences' + initialFileNo + '.json' ;
 }
 
 
@@ -141,7 +146,9 @@ function win() {
 function correctAnswer() {
 
 	//fill the word into the blank:
-	selectedSenElement.innerHTML = selectedSenElement.innerHTML.replace("_______", "<b>" + selectedWord.split('-')[0] + "</b>");
+	selectedSenElement.innerHTML = selectedSenElement.innerHTML.replace("_______", "<u>" + selectedWord.split('-')[0] + "</u>");
+	selectedSenElement.style.color = 'green';
+	selectedSenElement.style.fontWeight = 'bold';
 	selectedSenElement.style.pointerEvents = 'none';
 	wb.style.backgroundColor = 'lightgreen';
 	score ++;
@@ -187,7 +194,8 @@ function loadCorpus(query, fileId, doThisNext) {
 
 function getSentences(wordsArray) {  //gets sentences with the target words from Tatoeba corpus JSON file
 	
-	document.getElementById('loading').innerHTML = "<h2>Loading...Please wait...</h2><br><br>";
+	document.getElementById('message').style.display = 'block';
+	document.getElementById('message').innerHTML = "Loading...Please wait...";
 
 	sentencesPerWord = document.getElementById('sentences-per-word').value;	
 	var query;
@@ -221,7 +229,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 			foundWord = true;
 			
 			//add the word to wordbank:
-			if (!alreadyMadeWordDiv) { makeWordDiv(query) };  //prevents adding the words multiple times (if noOfSentences to get is > 1 )
+			if (!alreadyMadeWordDiv && query!=undefined) { makeWordDiv(query) };  //prevents adding the words multiple times (if noOfSentences to get is > 1 )
 			
 			var sentence = dataToSearch.sentences[j].replace(word, " _______ ");
 
@@ -239,7 +247,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 			foundWord = true;
 
 			//add the word to wordbank:
-			if (!alreadyMadeWordDiv) { makeWordDiv(query) };
+			if (!alreadyMadeWordDiv && query!=undefined) { makeWordDiv(query) };
 
 			var sentence = dataToSearch.sentences[j].replace(endWord, " _______.");
 
@@ -254,8 +262,29 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 
 	// if nothing found in these 100,000 sentences, so move to the next 100,000:
 	if (!foundWord) {
-		console.log("nothing found in first file, on to the next...");
-		fileNo ++;
+		console.log("nothing found in this file, on to the next...");
+		document.getElementById('message').innerHTML += '//';
+		fileNo++;
+		if (fileNo == 31) { fileNo = 0 }; // end of files, back to beginning
+
+		if (!foundWord && fileNo == initialFileNo) { //searched everything, back to the beginning, and still nothing found!  Go on to next word
+			console.log("word not found at all!");
+			document.getElementById('message').style.display = 'block';
+			document.getElementById('message').innerHTML = '';
+			document.getElementById('message').innerHTML += 'Note: One or more words were not found among 1,000,000+ sentences!<br>';
+			queryCount ++;  //go to next word
+			if (queryCount < searchTerms.length) {
+				console.log("on to the next word...");
+				fileNo = 0;
+				fileName = 'data/sentences' + initialFileNo + '.json' ;  //reset to first file
+				loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
+			} else{ //done
+				addClozeDivs();
+				document.getElementById('message').style.display = 'block';
+				document.getElementById('message').innerHTML += "Don't like these sentences?  Click 'Make Quiz' again to get new sentences!";
+			};
+		}; 
+
 		fileName = 'data/sentences' + fileNo + '.json' ;
 		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
 	}
@@ -263,16 +292,18 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 	//if more words still remain, go on to search for the next word (this, rather than a for loop, is needed for async ajax)
 	else if (queryCount < searchTerms.length) {
 		console.log("on to the next word...");
-		foundWord = false;
+		foundWord = false;  //found a word, so reset this
 		fileNo = 0;
-		fileName = 'data/sentences0.json' ;  //reset to first file
+		fileName = 'data/sentences' + initialFileNo + '.json' ;  //reset to first file
 		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
 	}
 
 	else{
 		//done
 		addClozeDivs();
-		document.getElementById('loading').innerHTML = '';
+		document.getElementById('message').style.display = 'block';
+		document.getElementById('message').innerHTML = '';
+		document.getElementById('message').innerHTML += "Don't like these sentences?  Click 'Make Quiz' again to get new sentences!";
 	};
 }
 

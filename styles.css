@@ -1,33 +1,72 @@
+html, body {
+    margin:0; /* remove default margin */
+    padding:0; /* remove default padding */
+    width:100%; /* take full browser width */
+    height:100%; /* take full browser height*/
+}
+
+
+body {
+    padding:5px; /* remove default padding */
+    font-family: Helvetica;
+}
+
+
 h1 {
-	font-size: 36px;
-	font-family: Helvetica;
-	font-weight: bold;
+	font-size: 2em;
 	color: #5074aa;
+	font-weight: bold;
 }
 
 h2 {
-	font-size: 24px;
-	font-family: Helvetica;
+	font-size: 1.5em;
 	font-weight: bold;
 	color: #5074aa;
 }
 
-.small-text {
-	font-size: 12px;
-	font-family: Helvetica;	
+h3 {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: green;
+}
+
+li {
+	line-height: 28px;
+}
+
+footer {
+	position: absolute;
+	bottom: 10px;
+	width: inherit;
+	font-size: 1.1em;
+	text-align: center;
+}
+
+#number-box-div, #alert {
+	display: inline-block;
+}
+
+#sentences-per-word {
+	width: 30px;
+}
+
+.small-text, .med-text, .big-text, #sentences {
 	margin: 3px;
-	line-height: 25%;
+	font-family: Helvetica;
+	line-height: 1.2em;
+}
+
+.small-text {
+	font-size: 1em;
+
 }
 
 .med-text {
-	font-size: 16px;
-	font-family: Helvetica;	
-	margin: 3px;
+	font-size: 1.2em;
 }
 
 .big-text {
-	font-size: 24px;
-	font-family: Helvetica;
+	font-size: 1.3em;
 }
 
 .row {
@@ -35,6 +74,13 @@ h2 {
 	border: solid lightblue 3px;
 	width: 80vw;
 }
+
+#search {
+	height: 20px;
+	width: 80%;
+	vertical-align: top;
+}
+
 
 .sentence {
 	border: none;
@@ -55,11 +101,89 @@ h2 {
 }
 
 #message {
-	font-size: 14px;
-	font-family: Helvetica;	
-	color: orange;
+	font-size: 1.2em;
+	color: green;
+	margin: 40px 0;
+	display: none;
 }
 
 #wordbank {
 	visibility: hidden;
+}
+
+#tips {
+	color: green;
+	margin-top: 50px
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* desktop screen */
+@media only screen and (min-width: 800px)  {   
+
+
+
+}
+
+/* mobile screen */
+@media only screen and (max-width: 800px) {
+
+	ul {
+		padding-left: 20px;
+	}
+
+	li {
+		line-height: 24px;
+	}
+
+	h1 {
+		text-align: center;
+	}
+
+	footer {
+		bottom: 0px;
+		font-size: .8em;
+	}
+
+	.big-text {
+		font-size: 1.2em;
+	}
+
+	#search {
+		height: 40px;
+		width: 95vw;
+	}
+
+	#tips {
+		color: green;
+		margin-top: 5px;
+		line-height: 1px;
+		font-size: 14px;
+		padding-right: 20px;
+		text-align: justify;
+	}
+
+	#message {
+		font-size: 1em;
+		margin: 20px 0;
+	}
+
+	#sentences, #wordbank, #header {
+		font-size: 1em;
+		line-height: 1.5em;
+	}
+
+	#wordbank {
+		width: 90%;
+	}
+
 }
