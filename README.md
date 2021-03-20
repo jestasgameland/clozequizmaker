@@ -9,9 +9,9 @@ DIRECTIONS:
 
 RECENT UPDATES:
 - increased loading speed by splitting Tatoeba corpus into sets of 33,333 sentences each.  Loading time went from ~30s to ~5s!
+- mobile support added
 
 TO DO:
 - option to create printable worksheet
-- mobile support
 - other languages support (Tatoeba corpus has multiple languages)
-- Explore ways to fetch sentences as needed from an API, rather than iterate through a huge list to find a sentence with each target word
+- Explore ways to fetch sentences as needed from an API (Merriam Webster), rather than iterate through a huge list to find a sentence with each target word
