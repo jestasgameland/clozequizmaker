@@ -73,6 +73,7 @@ footer {
 	padding: 5px;
 	border: solid lightblue 3px;
 	width: 80vw;
+	border-radius: 10px;
 }
 
 #search {
@@ -114,6 +115,18 @@ footer {
 #tips {
 	color: green;
 	margin-top: 50px
+}
+
+.worksheet {
+
+}
+
+.worksheet: hover {
+	pointer-events: none;
+}
+
+#back, #worksheet {
+	display: none;
 }
 
 

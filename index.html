@@ -23,31 +23,39 @@
 	
 <body>
 
-	<h1 id='title'>Cloze Quiz Generator</h1>
+	<div id='directions'>
 
-	<p class='big-text'>Enter words <strong>(or phrases!)</strong>, separated by commas:</p>
-	<br>
+		<h1 id='title'>Cloze Quiz Generator</h1>
 
-	<input type='text' placeholder = '(Examples: explore, creative, out of control, a little)' id='search'/>
+		<p class='big-text'>Enter words <strong>(or phrases!)</strong>, separated by commas:</p>
+		<br>
 
-	<br>
-	<br>
-	<div>
-		<div id = "number-box-div">
-			<label id = 'alert' class='small-text' for='number-box'>Sentences per word/phrase:</label>
-			<input inputmode="numeric" pattern="[0-9]*" type='number' name='number-box' id='sentences-per-word' placeholder='#' size=1/>
+		<input type='text' placeholder = '(Examples: explore, creative, out of control, a little)' id='search'/>
+
+		<br>
+		<br>
+		<div>
+			<div id = "number-box-div">
+				<label id = 'alert' class='small-text' for='number-box'>Sentences per word/phrase:</label>
+				<input inputmode="numeric" pattern="[0-9]*" type='number' name='number-box' id='sentences-per-word' placeholder='#' size=1/>
+			</div>
 		</div>
+		<br>
+
+		<button id='start-button' onclick="main()">Make Quiz</button>
+		<div id='message'></div>
 	</div>
-	<br>
 
-	<button id='start-button' onclick="main()">Make Quiz</button>
-	<div id='message'></div>
+	<div id='activity'>
+		<p id='header' class='med-text'></p>
 
-	<p id='header' class='med-text'></p>
+		<div id='wordbank' class='row med-text'></div>
 
-	<div id='wordbank' class='row med-text'></div>
+		<div id='sentences' class='med-text'></div>
+	</div>
 
-	<div id='sentences' class='med-text'></div>
+	<button id='worksheet' onclick="toggleWorksheet()">Get Printable Worksheet</button>
+	<button id='back' onclick="toggleWorksheet()">Back</button>
 
 	<div id='tips'>
 		<h3>Tips:</h3>
@@ -63,7 +71,7 @@
 	<footer>Created by <a href="https://www.brendonalbertson.com">Brendon Albertson</a>.  Powered by the <a href='http://www.tatoeba.org'>Tatoeba Corpus</a></footer>
 
 
-	<script src="sentences_fetcher.js"></script>
+	<script src="main.js"></script>
 	
 	<script src="shuffle.js"></script>
 

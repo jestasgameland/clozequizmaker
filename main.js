@@ -28,6 +28,8 @@ var fileName;
 
 var queryCount = 0;
 
+var print = false;
+
 
 
 
@@ -50,6 +52,7 @@ function main() {
 	document.getElementById('wordbank').innerHTML = '';
 	document.getElementById('message').innerHTML = '';
 	document.getElementById('message').style.display = 'none';
+	document.getElementById('worksheet').style.display = 'block';
 	document.getElementById('start-button').innerHTML = 'Make Quiz';
 
 	counterForNames = 0;
@@ -268,14 +271,14 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		if (fileNo == 31) { fileNo = 0 }; // end of files, back to beginning
 
 		if (!foundWord && fileNo == initialFileNo) { //searched everything, back to the beginning, and still nothing found!  Go on to next word
-			console.log("word not found at all!");
+			console.log("Word '" + query + "'' not found in Tatoeba corpus.");
 			document.getElementById('message').style.display = 'block';
 			document.getElementById('message').innerHTML = '';
 			document.getElementById('message').innerHTML += 'Note: One or more words were not found among 1,000,000+ sentences!<br>';
 			queryCount ++;  //go to next word
 			if (queryCount < searchTerms.length) {
 				console.log("on to the next word...");
-				fileNo = 0;
+				fileNo = initialFileNo;
 				fileName = 'data/sentences' + initialFileNo + '.json' ;  //reset to first file
 				loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
 			} else{ //done
@@ -293,7 +296,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 	else if (queryCount < searchTerms.length) {
 		console.log("on to the next word...");
 		foundWord = false;  //found a word, so reset this
-		fileNo = 0;
+		fileNo = initialFileNo;
 		fileName = 'data/sentences' + initialFileNo + '.json' ;  //reset to first file
 		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
 	}
@@ -304,6 +307,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		document.getElementById('message').style.display = 'block';
 		document.getElementById('message').innerHTML = '';
 		document.getElementById('message').innerHTML += "Don't like these sentences?  Click 'Make Quiz' again to get new sentences!";
+		document.getElementsByTagName('footer')[0].style.display = 'none';
 	};
 }
 
@@ -369,6 +373,41 @@ function addClozeDivs() {
 		document.getElementById('sentences').appendChild(clozeSentences[i]);
     };
 }
+
+
+
+
+function toggleWorksheet() {
+
+	if (!print) {
+
+		print = true;
+
+		document.getElementById('header').innerHTML = "Name: _______________________<br><br>" + document.getElementById('header').innerHTML;
+		document.getElementById('directions').style.display = 'none';
+		document.getElementById('activity').className = 'worksheet';  //this disables pointer events
+		wb.style.border = 'solid black 1px';
+
+		document.getElementById('back').style.display = 'block';
+		document.getElementById('worksheet').style.display = 'none';
+
+	}
+	else {
+		print = false;
+
+		document.getElementById('header').innerHTML = '<strong>Directions: Click a word and a sentence to make a match.</strong>';
+		document.getElementById('directions').style.display = 'block';
+		document.getElementById('activity').className = '';  //this disables pointer events
+		wb.style.border = 'solid lightblue 3px';
+
+		document.getElementById('back').style.display = 'none';
+		document.getElementById('worksheet').style.display = 'block';
+
+	}
+}
+
+
+
 
 
 //run the search when user presses Enter
