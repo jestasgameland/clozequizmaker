@@ -10,6 +10,7 @@ DIRECTIONS:
 RECENT UPDATES:
 - increased loading speed by splitting Tatoeba corpus into sets of 33,333 sentences each.  Loading time went from ~30s to ~5s!
 - mobile support added
+- Japanese version added
 
 TO DO:
 - option to create printable worksheet
