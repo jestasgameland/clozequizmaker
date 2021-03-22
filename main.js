@@ -29,19 +29,37 @@ var fileName;
 var queryCount = 0;
 
 var print = false;
+var language;
 
-
-
-
+var radios;
+var fileSuffix = '.json';  //add language suffix to this (jp.json, ch.json, etc.  No suffix for English )
 
 
 function main() {
 
-	if (document.getElementById('sentences-per-word').value == "") {
+	if (document.getElementById('sentences-per-word').value == "" || document.getElementById('sentences-per-word').value < 1) {
 		document.getElementById('alert').style.backgroundColor = 'yellow';
-		document.getElementById('alert').innerHTML += '<br><b>Please enter a number for sentences per word/phrase!</b>';
+		document.getElementById('alert').innerHTML += '<br><b>Please enter a number above 0 for sentences per word/phrase!</b>';
 		return;
 	}
+
+	//check language setting::
+	radios = document.getElementsByName('language');
+	for (n in radios) {
+		if (radios[n].checked == true) { language = radios[n].value }
+	}
+
+	if (language != 'en') {
+		fileSuffix = language + '.json';
+	} else {fileSuffix = '.json'}
+
+	switch(language) {
+		case 'en': initialFileNo = Math.floor(Math.random() * 31); break;
+		case 'jp': initialFileNo = Math.floor(Math.random() * 5); break;
+		default: break;
+	}
+
+	
 
 	document.getElementById('alert').style.backgroundColor = 'white';
 	document.getElementById('alert').innerHTML = 'Sentences per word/phrase:';
@@ -52,7 +70,6 @@ function main() {
 	document.getElementById('wordbank').innerHTML = '';
 	document.getElementById('message').innerHTML = '';
 	document.getElementById('message').style.display = 'none';
-	document.getElementById('worksheet').style.display = 'block';
 	document.getElementById('start-button').innerHTML = 'Make Quiz';
 
 	counterForNames = 0;
@@ -62,9 +79,9 @@ function main() {
 	clickedSentence = false;
 	clozeSentences = [];
 	queryCount = 0;
-	initialFileNo = Math.floor(Math.random() * 31);
+	
 	fileNo = initialFileNo; // fileNo will be changed, but initialFileNo won't
-	fileName = 'data/sentences' + initialFileNo + '.json';
+	fileName = 'data/sentences' + initialFileNo + fileSuffix;
 
 
 	wb.style.visibility = 'visible';
@@ -72,7 +89,17 @@ function main() {
 	//add the name line and directions
 	document.getElementById('header').innerHTML = '<strong>Directions: Click a word and a sentence to make a match.</strong>';
 
-	searchTerms = $('#search').val().toLowerCase().replace(/,\s+/g,",").split(",");
+	switch (language) {
+		case 'en':
+			searchTerms = $('#search').val().toLowerCase().replace(/,\s+/g,",").split(",");
+			break;
+		case 'jp':
+			searchTerms = $('#search').val().replace(/、+/g,",");
+			searchTerms = $('#search').val().replace(/,\s+/g,",");
+			searchTerms = searchTerms.split(",");
+			break;
+		default: break;
+	}
 
 	searchTerms = shuffle(searchTerms);
 				
@@ -83,6 +110,7 @@ function main() {
 
 function makeClozeSentence(sen, correctWord, name) {
 
+	if (correctWord == undefined) {return};
 	var sentenceDiv = document.createElement('div');
 	sentenceDiv.innerHTML = sen + '<br><br>';
 	sentenceDiv.className = 'row sentence';
@@ -134,8 +162,8 @@ function makeClozeSentence(sen, correctWord, name) {
 
 	//reset filename back to first 100,000 sentences:
 //	fileNo = 0;
-//	fileName = 'data/sentences' + fileNo + '.json' ;
-//	fileName = 'data/sentences' + initialFileNo + '.json' ;
+//	fileName = 'data/sentences' + fileNo + fileSuffix ;
+//	fileName = 'data/sentences' + initialFileNo + fileSuffix ;
 }
 
 
@@ -214,18 +242,25 @@ function getSentences(wordsArray) {  //gets sentences with the target words from
 
 
 function searchCorpus(query, dataToSearch) {  //dataToSearch is the response from ajax (json object)
-	var	word    = ' ' + query + ' ';
-	var endWord = ' ' + query + '.';
-	count = 0;
-	alreadyMadeWordDiv = false;
+
+	if (language == 'jp' || language == 'cn') {
+		var word = query;
+	} else {
+		var	word    = ' ' + query + ' ';
+		var endWord = ' ' + query + '.';
+	};
 	//	var wordWithComma = ' ' + wordsArray[i] + ',';
 	//	var wordWithColon = ' ' + wordsArray[i] + ':';
+	count = 0;
+	alreadyMadeWordDiv = false;
+
+	var sentences = dataToSearch.sentences;
 
 	//search through 100,000 sentences of the Tatoeba corpus:
-	for (j=0; j<dataToSearch.sentences.length; j++) {
+	for (j=0; j<sentences.length; j++) {
 
 		//if word is found in a sentence:
-		if (dataToSearch.sentences[j].includes(word)) {
+		if (sentences[j].includes(word)) {
 
 			if (!foundWord) {queryCount ++};  //only increase queryCount by 1 per word, not per sentence (sometimes multiple sentences per word)
 
@@ -234,7 +269,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 			//add the word to wordbank:
 			if (!alreadyMadeWordDiv && query!=undefined) { makeWordDiv(query) };  //prevents adding the words multiple times (if noOfSentences to get is > 1 )
 			
-			var sentence = dataToSearch.sentences[j].replace(word, " _______ ");
+			var sentence = sentences[j].replace(word, " _______ ");
 
 			counterForNames++;
 			//make a cloze sentence and add it to the clozeSentences array:
@@ -244,7 +279,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		}
 
 		//if word found at END of sentence:
-		else if (dataToSearch.sentences[j].includes(endWord)) {
+		else if (sentences[j].includes(endWord)) {
 
 			if (!foundWord) {queryCount ++};
 			foundWord = true;
@@ -252,7 +287,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 			//add the word to wordbank:
 			if (!alreadyMadeWordDiv && query!=undefined) { makeWordDiv(query) };
 
-			var sentence = dataToSearch.sentences[j].replace(endWord, " _______.");
+			var sentence = sentences[j].replace(endWord, " _______.");
 
 			counterForNames++;
 			//make a cloze sentence and add it to the clozeSentences array:
@@ -260,7 +295,7 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		}
 
 		//stop getting sentences after you've found enough:
-		if (count == sentencesPerWord) { break };  // (count is set by makeClozeSentence)
+		if (count == sentencesPerWord && foundWord) { break };  // (count is set by makeClozeSentence)
 	}
 
 	// if nothing found in these 100,000 sentences, so move to the next 100,000:
@@ -269,26 +304,18 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		document.getElementById('message').innerHTML += '//';
 		fileNo++;
 		if (fileNo == 31) { fileNo = 0 }; // end of files, back to beginning
+		if (fileNo == 5 && language=='jp') { fileNo = 0 };
 
-		if (!foundWord && fileNo == initialFileNo) { //searched everything, back to the beginning, and still nothing found!  Go on to next word
-			console.log("Word '" + query + "'' not found in Tatoeba corpus.");
-			document.getElementById('message').style.display = 'block';
+		//If nothing found in ALL files:
+		if (!foundWord && fileNo == initialFileNo) { 
+			alert ("Sorry, '" + query + "' could not be found among 1,000,000+ sentences!. Please check spelling and try again.");
+			document.getElementById('sentences').innerHTML = '';
 			document.getElementById('message').innerHTML = '';
-			document.getElementById('message').innerHTML += 'Note: One or more words were not found among 1,000,000+ sentences!<br>';
-			queryCount ++;  //go to next word
-			if (queryCount < searchTerms.length) {
-				console.log("on to the next word...");
-				fileNo = initialFileNo;
-				fileName = 'data/sentences' + initialFileNo + '.json' ;  //reset to first file
-				loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
-			} else{ //done
-				addClozeDivs();
-				document.getElementById('message').style.display = 'block';
-				document.getElementById('message').innerHTML += "Don't like these sentences?  Click 'Make Quiz' again to get new sentences!";
-			};
+			wb.innerHTML = '';
+			return;
 		}; 
 
-		fileName = 'data/sentences' + fileNo + '.json' ;
+		fileName = 'data/sentences' + fileNo + fileSuffix ;
 		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
 	}
 
@@ -297,13 +324,14 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		console.log("on to the next word...");
 		foundWord = false;  //found a word, so reset this
 		fileNo = initialFileNo;
-		fileName = 'data/sentences' + initialFileNo + '.json' ;  //reset to first file
+		fileName = 'data/sentences' + initialFileNo + fileSuffix ;  //reset to first file
 		loadCorpus(searchTerms[queryCount], fileName, searchCorpus);  
 	}
 
 	else{
 		//done
 		addClozeDivs();
+		document.getElementById('worksheet').style.display = 'block';
 		document.getElementById('message').style.display = 'block';
 		document.getElementById('message').innerHTML = '';
 		document.getElementById('message').innerHTML += "Don't like these sentences?  Click 'Make Quiz' again to get new sentences!";
