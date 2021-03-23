@@ -94,9 +94,10 @@ function main() {
 			searchTerms = $('#search').val().toLowerCase().replace(/,\s+/g,",").split(",");
 			break;
 		case 'jp':
-			searchTerms = $('#search').val().replace(/、+/g,",");
-			searchTerms = $('#search').val().replace(/,\s+/g,",");
+			searchTerms = $('#search').val().replace(/、/g,",");
+			searchTerms = searchTerms.replace(/,\s+/g,",");
 			searchTerms = searchTerms.split(",");
+			alert(searchTerms);
 			break;
 		default: break;
 	}
