@@ -1,6 +1,7 @@
 
 var wb = document.getElementById('wordbank');
 var searchTerms;
+var word;
 
 var selectedSenElement;
 var selectedSenName;
@@ -55,7 +56,9 @@ function main() {
 
 	switch(language) {
 		case 'en': initialFileNo = Math.floor(Math.random() * 31); break;
-		case 'jp': initialFileNo = Math.floor(Math.random() * 5); break;
+		case 'jp':
+			initialFileNo = Math.floor(Math.random() * 5);   
+			break;
 		default: break;
 	}
 
@@ -97,7 +100,6 @@ function main() {
 			searchTerms = $('#search').val().replace(/、/g,",");
 			searchTerms = searchTerms.replace(/,\s+/g,",");
 			searchTerms = searchTerms.split(",");
-			alert(searchTerms);
 			break;
 		default: break;
 	}
@@ -160,11 +162,6 @@ function makeClozeSentence(sen, correctWord, name) {
 	clozeSentences.push(sentenceDiv);
 
 	count ++;  
-
-	//reset filename back to first 100,000 sentences:
-//	fileNo = 0;
-//	fileName = 'data/sentences' + fileNo + fileSuffix ;
-//	fileName = 'data/sentences' + initialFileNo + fileSuffix ;
 }
 
 
@@ -241,24 +238,36 @@ function getSentences(wordsArray) {  //gets sentences with the target words from
 }
 
 
+function findJapaneseMatch(query, sentences) {
 
-function searchCorpus(query, dataToSearch) {  //dataToSearch is the response from ajax (json object)
+	//see if the word exists in a sentence:
+	function checkSentence(sen) {
+		for (w in sen) {
+			if (sen[w] == query) { // if word was found:
+				if (!foundWord) {queryCount ++};  //only increase queryCount by 1 per word, not per sentence (sometimes multiple sentences per word)
+				foundWord = true;
+				if (!alreadyMadeWordDiv && query!=undefined) { makeWordDiv(query) };
+				var clozeSentence = sen;
+				clozeSentence[w] = "_____";
+				clozeSentence = clozeSentence.join('');
+				counterForNames++;
+				makeClozeSentence(clozeSentence, query, counterForNames);
+				break;	//stop making sentence divs, even if there are multiple blanks for this sentence.  
+						// Note: There could be multiple instances of the word in each sentence, especially with が、は、に、etc.  Without break, this would copy the sentence for each instance.
+			}
+		}
+	}
 
-	if (language == 'jp' || language == 'cn') {
-		var word = query;
-	} else {
-		var	word    = ' ' + query + ' ';
-		var endWord = ' ' + query + '.';
-	};
-	//	var wordWithComma = ' ' + wordsArray[i] + ',';
-	//	var wordWithColon = ' ' + wordsArray[i] + ':';
-	count = 0;
-	alreadyMadeWordDiv = false;
+	//search through tokenized Japanese sentences:
+	for (j in sentences) {
+		checkSentence(sentences[j])
+		if (count == sentencesPerWord && foundWord) { break };
+	}
+}
 
-	var sentences = dataToSearch.sentences;
-
+function findMatch(query, sentences) {
 	//search through 100,000 sentences of the Tatoeba corpus:
-	for (j=0; j<sentences.length; j++) {
+	for (j in sentences) {
 
 		//if word is found in a sentence:
 		if (sentences[j].includes(word)) {
@@ -275,8 +284,6 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 			counterForNames++;
 			//make a cloze sentence and add it to the clozeSentences array:
 			makeClozeSentence(sentence, query, counterForNames);
-
-			
 		}
 
 		//if word found at END of sentence:
@@ -298,6 +305,30 @@ function searchCorpus(query, dataToSearch) {  //dataToSearch is the response fro
 		//stop getting sentences after you've found enough:
 		if (count == sentencesPerWord && foundWord) { break };  // (count is set by makeClozeSentence)
 	}
+}
+
+
+
+function searchCorpus(query, dataToSearch) {  //dataToSearch is the response from ajax (json object)
+
+	if (language == 'jp' || language == 'cn') {
+		word = query;
+	} else {
+		word    = ' ' + query + ' ';
+		endWord = ' ' + query + '.';
+	};
+	//	var wordWithComma = ' ' + wordsArray[i] + ',';
+	//	var wordWithColon = ' ' + wordsArray[i] + ':';
+	count = 0;
+	alreadyMadeWordDiv = false;
+
+	var sentences = dataToSearch.sentences;
+
+
+	if (language == 'jp') {findJapaneseMatch(query, sentences)}
+
+	else {findMatch(query, sentences)};
+
 
 	// if nothing found in these 100,000 sentences, so move to the next 100,000:
 	if (!foundWord) {
