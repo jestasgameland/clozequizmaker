@@ -1,7 +1,7 @@
 Cloze Quiz Generator v1.2
 
 An app for automating the creation of cloze (fill-in-the-blank) vocabulary and grammar activities.
-Powered by the Tatoeba corpus.
+Powered by the Tatoeba corpus and Mecab tokenizer.
 
 DIRECTIONS:
 - First unzip the "data.zip" file.  This is a set of JSON files each containing a chunk of the Tatoeba corpus.  Then the app can be run as normal.
@@ -10,7 +10,7 @@ DIRECTIONS:
 RECENT UPDATES:
 - increased loading speed by splitting Tatoeba corpus into sets of 33,333 sentences each.  Loading time went from ~30s to ~5s!
 - mobile support added
-- Japanese version added
+- Japanese version added, using the Mecab tokenizer
 
 TO DO:
 - option to create printable worksheet
